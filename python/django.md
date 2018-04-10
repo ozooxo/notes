@@ -63,6 +63,24 @@ Run applications:
 - `python manage.py runserver` for the web service. Visit the sites from `http://localhost:8000/app_name/`
 - `python manage.py shell`: interactive shell to interact with the codebase (model, ...)
 
+## ORM
+
+- Database-access API
+- Database generator
+
+Setup:
+
+Alter `INSTALLED_APPS` in `project_name/project_name/settings.py` to add the corresponding app into it.
+
+General design rules:
+
+- Model class subclasses `django.db.models.Model`. (Generally) it maps to a single database table.
+  - By default table name `appName_className`.
+- Class attribute represents field/column of database tables.
+  - Fields are instances of `models.Field` class. It has a lot of predefined subclasses to decide the database column type.
+  - Primaty key is the `id` field.
+
 ## References
 
 1. Official [Writing your first Django app](https://docs.djangoproject.com/en/2.0/intro/tutorial01/). It is actually a quite long tutorial that tell you in depth how to use django (in its design way to make a startard web app). Most paragraphs are about how to setup the views.
+1. General [Django documentation](https://docs.djangoproject.com/en/2.0/).
