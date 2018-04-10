@@ -78,3 +78,4 @@ Usage:
 1. [`pdb` official document for python 2.7](https://docs.python.org/2/library/pdb.html).
 1. [`pdb` tutorial](https://github.com/spiside/pdb-tutorial) by spiside.
 1. [Become a pdb power-user](https://medium.com/instamojo-matters/become-a-pdb-power-user-e3fc4e2774b2)
+1. [Python debugger cheatsheet](https://nblock.org/2011/11/15/pdb-cheatsheet/)
