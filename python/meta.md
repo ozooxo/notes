@@ -58,6 +58,8 @@ class ClassName():
 	...
 ```
 
+*(Is there a special reason meta class `__init__` uses `cls` rather than `self`, or it is just an convention?)*
+
 Inline definition:
 
 ```python
@@ -133,6 +135,8 @@ class SingletonMeta(type):
              cls.instance = super(SingletonMeta, cls).__call__(*args, **kw)
         return cls.instance
 ```
+
+*(Seems not right, as `instance` should be shared by all class objects rather than all classes (meta class objects). However, as `instance` is in meta class scope it is then shared by all classes, which seems not right...)*
 
 ### w/ class decorator
 
