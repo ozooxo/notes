@@ -4,7 +4,16 @@
 
 Class (static) variables and methods can be modified after the class is defined. The modification affects all class instances, include the ones instantiated before.
 
-Class is a `type` instance. 
+Class is a `type` instance to forbidden creating a new instance if it already exists.
+
+```python
+class SingletonMeta(type):
+    instance = None
+    def __call__(cls, *args, **kw):
+        if not cls.instance:
+             cls.instance = super(Singleton, cls).__call__(*args, **kw)
+        return cls.instance
+```
 
 
 ```python
@@ -83,17 +92,49 @@ Notes:
 
 Sometimes, class decorators may do similar jobs.
 
-## Comparison
+## Benefits and comparison
 
-### w/ class inheritance
-
-Class inheritance can't do:
+### Benefits
 
 - Meta class may have a variable to save the information of all the subclasses.
 	- The variable is defined as `cls.variable_name` which is per its instance (for each class with this as the meta class).
-- Define meta methods for which the class itself is the argument.
-	- `__str__()` in meta class defines `print(ClassName)`.
-	- `__iter__()` in meta class defines `for c in ClassName`.
+- Define **meta methods** for which the class itself is the argument.
+	- Notice that meta methods can be called from meta classes and classes, but not from instances.
+	- Examples:
+		- `__str__()` in meta class defines `print(ClassName)`.
+		- `__iter__()` in meta class defines `for c in ClassName`.
+
+### Implementations
+
+#### Final class
+
+Forbidden class inheritance: In meta class `__init__()` check if the superclass has a meta class of itself, then raises error (as subclass inheritance meta class).
+
+```python
+class FinalMeta(type):
+    def __init__(cls, name, bases, namespace):
+        super(final, cls).__init__(name, bases, namespace)
+        for klass in bases:
+            if isinstance(klass, FinalMeta):
+                raise TypeError(str(klass.__name__) + " is final")
+```
+
+Can't be done by class decorator, because action happens when class is created.
+
+#### Singleton
+
+Override `__call__()` in meta class to forbidden creating a new instance if it already exists.
+
+```python
+class SingletonMeta(type):
+    instance = None
+    def __call__(cls, *args, **kw):
+        if not cls.instance:
+             cls.instance = super(SingletonMeta, cls).__call__(*args, **kw)
+        return cls.instance
+```
+
+### w/ class decorator
 
 ## Reference
 
