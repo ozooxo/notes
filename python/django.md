@@ -74,13 +74,28 @@ Alter `INSTALLED_APPS` in `project_name/project_name/settings.py` to add the cor
 
 General design rules:
 
-- Model class subclasses `django.db.models.Model`. (Generally) it maps to a single database table.
+- Model classes represent SQL tables. (Generally) it maps to *a single* database table.
+  - Model classes are subclasses `django.db.models.Model`. 
   - By default table name `appName_className`.
-- Class attribute represents field/column of database tables.
-  - Fields are instances of `models.Field` class. It has a lot of predefined subclasses to decide the database column type.
-  - Primaty key is the `id` field.
+- Class attributes may represent field/column of SQL tables.
+  - Fields are instances of `models.Field` class. Django has a lot of predefined subclasses to decide the database column type.
+  - Customized SQL column name goes as the first argument of the constructor.
+  - Field properties go as optional arguments of constructors. 
+    - (Similar to JPA annotations)
+    - `primary_key`, ...
+    - They'll be write to the database when migrating.
+  - Field constrains go as optional arguments of constructors. 
+    - (Similar to Java Validation API annotations)
+    - `unique`, `null`, `blank`, `choice`, `default`, `max_length`
+    - *(At least some like `unique` need to write as SQL constrain. Do these constrains go all the way down to SQL check conditions when doing migration? Or these constrains stay in application layer -- like Java Validation API?)*
+  - Primary key is automatically generated to the `id` field. No need to define a class attribute called `id`.
+    - May be customized by `primary_key = models.AutoField(primary_key=True)`. It will not be auto-incrementing. *(But auto-incrementing should be the SQL job -- SQL may choice another ways to generate unique primary key. This is only triggered when insert with a leak of primary key value. Why mentioned auto-incrementing in here?)*
+  - Class attributes are the only required part of a model class.
+- Class attributes may represent SQL relations.
+  - Fields are instances of `models.ForeignKey`, `models.ManyToManyField`, `models.OneToOneField`.
+  - Class name goes as the first argument of the constructor.
 
 ## References
 
 1. Official [Writing your first Django app](https://docs.djangoproject.com/en/2.0/intro/tutorial01/). It is actually a quite long tutorial that tell you in depth how to use django (in its design way to make a startard web app). Most paragraphs are about how to setup the views.
-1. General [Django documentation](https://docs.djangoproject.com/en/2.0/).
+1. General [Django documentation](https://docs.djangoproject.com/en/2.0/), especially the part related to [data models](https://docs.djangoproject.com/en/2.0/topics/db/models/).
