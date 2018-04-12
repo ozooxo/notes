@@ -10,11 +10,16 @@
 | Argument | `cls [, ...]` | `self [, ...]` |
 | Return value | typically `super(ThisClass, cls).__new__(cls)`, but can be customized | None |
 
-## `self` vs `cls`
+## Method vs `@classmethod` vs `@staticmethod`
 
-|       | `self` | `cls` | N/A |
-| ----- | ------ | ----- | --- |
-| As method argument | For instance methods | For `@classmethod` | `@staticmethod` don't need to implicitly pass any of them |
+|       | Method | `@classmethod` | @staticmethod |
+| ----- | ------ | -------------- | ------------- |
+| Argument | `self` | `cls` | None |
+| Call from outside | `instance_name.method_name()` | `ClassName.method_name()`<br>`instance_name.method_name()` | `ClassName.method_name()`<br>`instance_name.method_name()` |
+| Call in method | `self.method_name()` | `ClassName.method_name()` | `ClassName.method_name()` |
+| Call in `@classmethod` | N/A | `cls.method_name()` (if being called by a subclass, `cls` is the subclass) | `ClassName.method_name()` |
+| Call in `@staticmethod` | N/A | N/A | `ClassName.method_name()` |
+| Usage | | Special in python. Useful for creating alternate class constructors. | Although similar to static method in C++/Java, it is not quite useful in Python, because you can simply define functions out of a class scope. |
 
 ## Instance variable vs class variable
 
