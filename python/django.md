@@ -68,32 +68,80 @@ Run applications:
 - Database-access API
 - Database generator
 
-Setup:
+### Setup
 
 Alter `INSTALLED_APPS` in `project_name/project_name/settings.py` to add the corresponding app into it.
 
-General design rules:
+### ORM model definition
 
-- Model classes represent SQL tables. (Generally) it maps to *a single* database table.
-  - Model classes are subclasses `django.db.models.Model`. 
-  - By default table name `appName_className`.
-- Class attributes may represent field/column of SQL tables.
-  - Fields are instances of `models.Field` class. Django has a lot of predefined subclasses to decide the database column type.
-  - Customized SQL column name goes as the first argument of the constructor.
-  - Field properties go as optional arguments of constructors. 
-    - (Similar to JPA annotations)
-    - `primary_key`, ...
-    - They'll be write to the database when migrating.
-  - Field constrains go as optional arguments of constructors. 
-    - (Similar to Java Validation API annotations)
-    - `unique`, `null`, `blank`, `choice`, `default`, `max_length`
-    - *(At least some like `unique` need to write as SQL constrain. Do these constrains go all the way down to SQL check conditions when doing migration? Or these constrains stay in application layer -- like Java Validation API?)*
-  - Primary key is automatically generated to the `id` field. No need to define a class attribute called `id`.
-    - May be customized by `primary_key = models.AutoField(primary_key=True)`. It will not be auto-incrementing. *(But auto-incrementing should be the SQL job -- SQL may choice another ways to generate unique primary key. This is only triggered when insert with a leak of primary key value. Why mentioned auto-incrementing in here?)*
-  - Class attributes are the only required part of a model class.
-- Class attributes may represent SQL relations.
-  - Fields are instances of `models.ForeignKey`, `models.ManyToManyField`, `models.OneToOneField`.
-  - Class name goes as the first argument of the constructor.
+#### Model classes
+
+Model classes represent SQL tables. (Generally) it maps to *a single* database table.
+
+- Model classes are subclasses `django.db.models.Model`. 
+- By default table name `appName_className`.
+
+#### Model attributes
+
+Class attributes may represent field/column of SQL tables.
+
+- Fields are instances of `models.Field` class. Django has a lot of predefined subclasses to decide the database column type.
+- Verbose name goes as the optional first argument of the constructor.
+  - Verbose name is not the customized SQL column name (as it mostly have space and special characters in it).
+- SQL column name is specified by the optional named argument `db_column`. By default is is the name of the class attribute.
+- Field properties go as optional arguments of constructors. 
+  - (Similar to JPA annotations)
+  - `primary_key`, ...
+  - They'll be write to the database when migrating.
+- Field constrains go as optional arguments of constructors. 
+  - (Similar to Java Validation API annotations)
+  - `unique`, `null`, `blank`, `choice`, `default`, `max_length`
+  - *(At least some like `unique` need to write as SQL constrain. Do these constrains go all the way down to SQL check conditions when doing migration? Or these constrains stay in application layer -- like Java Validation API?)*
+- Primary key is automatically generated to the `id` field. No need to define a class attribute called `id`.
+  - May be customized by `primary_key_class_attribute = models.AutoField(primary_key=True)`. It will not be auto-incrementing. *(But auto-incrementing should be the SQL job -- SQL may choice another ways to generate unique primary key. This is only triggered when insert with a leak of primary key value. Why mentioned auto-incrementing in here?)*
+- Class attributes are the only required part of a model class.
+
+#### Relations
+
+Class attributes may represent SQL relations.
+
+- Fields are instances of `models.ForeignKey` (for many-to-one relationship), `models.ManyToManyField`, `models.OneToOneField`.
+- Class name in relation goes as the first argument of the constructor.
+- `verbose_name` is an optional named argument to describe the relationship.
+- For many-to-may relationship, the relation table can have other columns to describe the properties of the relation. In that case, we should define a intermediate model `RelationClassName`. Use the `through='RelationClassName'` optional named argument in the `models.ManyToManyField` constructor, and in `RelationClassName` class define both foreign keys.
+  - This may be generated to a relation table with not exactly two foreign keys.
+
+#### Inheritance
+
+For inheritance mapping, compare to all what can be done in Hibernate:
+
+- MappedSuperclass: The shared (abstract) parent classes can't be entities, and every subclass is a table.
+  - Done through [abstract base classes](https://docs.djangoproject.com/en/2.0/topics/db/models/#abstract-base-classes). Set `abstract = True` through the `Meta` of the shared parent class.
+- Single Table: The entities from different classes with a common ancestor are placed in a single table with several nullable columns.
+  - Not supported.
+- Table-Per-Class: All the properties of a class, are in its table, so no join is required.
+  - Supported through [multi-table inheritance](https://docs.djangoproject.com/en/2.0/topics/db/models/#multi-table-inheritance)
+  - This is the by-default case without extra code.
+- Joined Table: each class has its table and querying a subclass entity requires joining the tables.
+  - Seems not supported. Workaround is maybe explicitly write one-to-one relationships?
+
+Class inheritance only used in the Django layer, are setup through [proxy model](https://docs.djangoproject.com/en/2.0/topics/db/models/#proxy-models):
+
+```
+class DjangoLayerExtendedModelClassName(ModelClassName):
+  class Meta:
+    proxy = True
+```
+
+### ORM usage
+
+#### Data construction
+
+- Model class instances are defined by `ModelClassName.objects.create(class_attribute_name_1=..., ...)` with all the class attributes as optional named argument.
+
+#### Interacting with the database
+
+- Save to database by `model_instance.save()`.
 
 ## References
 
