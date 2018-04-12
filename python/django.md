@@ -4,7 +4,7 @@
 
 Django 2.0 -> Python 3.4
 
-## General
+## General/web application
 
 - MVC framework
 - On top of a light-weight python Web Server Gateway Interface (WSGI)-compatible web server.
@@ -63,6 +63,36 @@ Run applications:
 - `python manage.py runserver` for the web service. Visit the sites from `http://localhost:8000/app_name/`
 - `python manage.py shell`: interactive shell to interact with the codebase (model, ...)
 
+### Non-web application
+
+Add Django management command by adding a python script in `app_name/management/commands/my_command.py`.
+
+```
+app_name/
+    ...
+    management/
+        __init__.py
+        commands/
+            __init__.py
+            _private.py   <-- not available as management command
+            my_command.py <-- available for any project which 
+                              include this app in its 
+                              `INSTALLED_APPS` of settings.py
+```
+
+`my_command.py` should looks like:
+
+```python
+from django.core.management.base import BaseCommand
+from app_name... import ...
+
+class Command(BaseCommand):
+    def handle(self, *args, **kwargs):
+        print "Hello, world"
+```
+
+It can be executed by `./manage.py my_command args`.
+
 ## ORM
 
 - Database-access API
@@ -70,7 +100,7 @@ Run applications:
 
 ### Setup
 
-Alter `INSTALLED_APPS` in `project_name/project_name/settings.py` to add the corresponding app into it.
+Alter `INSTALLED_APPS` in `project_name/settings.py` to add the corresponding app into it.
 
 ### ORM model definition
 
@@ -147,3 +177,4 @@ class DjangoLayerExtendedModelClassName(ModelClassName):
 
 1. Official [Writing your first Django app](https://docs.djangoproject.com/en/2.0/intro/tutorial01/). It is actually a quite long tutorial that tell you in depth how to use django (in its design way to make a startard web app). Most paragraphs are about how to setup the views.
 1. General [Django documentation](https://docs.djangoproject.com/en/2.0/), especially the part related to [data models](https://docs.djangoproject.com/en/2.0/topics/db/models/).
+1. [Writing custom django-admin commands](https://docs.djangoproject.com/en/2.0/howto/custom-management-commands/)
