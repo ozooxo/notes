@@ -140,6 +140,9 @@ Class attributes may represent SQL relations.
 - `verbose_name` is an optional named argument to describe the relationship.
 - For many-to-may relationship, the relation table can have other columns to describe the properties of the relation. In that case, we should define a intermediate model `RelationClassName`. Use the `through='RelationClassName'` optional named argument in the `models.ManyToManyField` constructor, and in `RelationClassName` class define both foreign keys.
   - This may be generated to a relation table with not exactly two foreign keys.
+- For foreign key (many-to-one relationship), there is no corresponding one-to-many relationship written in the one-class. Just query by `one_instance_name.many_instance_name_set.all()`.
+
+Also, notice that since python classes cannot be used before being defined, definition can only go one way. So for one-to-many relationship, the one-class need to go before the many-class. For many-to-many relationship, the `models.ManyToManyField` class attribute can only be set for the later class.
 
 #### Inheritance
 
@@ -158,16 +161,40 @@ For inheritance mapping, compare to all what can be done in Hibernate:
 Class inheritance only used in the Django layer, are setup through [proxy model](https://docs.djangoproject.com/en/2.0/topics/db/models/#proxy-models):
 
 ```
-class DjangoLayerExtendedModelClassName(ModelClassName):
+class DjangoLayerExtendedModelClass(ModelClass):
   class Meta:
     proxy = True
 ```
 
 ### ORM usage
 
-#### Data construction
+Notice that `ModelClass.objects` is the model manager.
 
-- Model class instances are defined by `ModelClassName.objects.create(class_attribute_name_1=..., ...)` with all the class attributes as optional named argument.
+#### `INSERT`
+
+```python
+one_model_instance = OneModelClass(class_attribute_1=..., ...)
+one_model_instance.save()
+
+many_model_instance = ManyModelClass(foreign_key_attribute=one_model_instance, ...)
+manu_model_instance.save() # one_model_instance.save() will not refresh/insert the many instances
+
+many_model_instance.many_to_many_class_attribute.add(another_many_model_instance)
+```
+
+#### `UPDATE`
+
+```python
+model_instance = ModelClass.objects.get(...)
+model_instance.class_attribute = new_value
+model_instance.save()
+```
+
+#### `SELECT`
+
+`SELECT * FROM model_class;` => `all_model_instances = ModelClass.objects.all()`
+
+`SELECT * FROM model_class WHERE attribute=value;` => `model_instances = ModelClass.objects.filter(attribute=value)`
 
 #### Interacting with the database
 
