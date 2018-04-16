@@ -182,7 +182,50 @@ manu_model_instance.save() # one_model_instance.save() will not refresh/insert t
 many_model_instance.many_to_many_class_attribute.add(another_many_model_instance)
 ```
 
+#### `SELECT`
+
+`SELECT * FROM model_class;` => `all_model_instances = ModelClass.objects.all()`
+
+`SELECT * FROM model_class WHERE attribute=value;` =>  `model_instance = ModelClass.objects.get(attribute=value)`: Raise `DoesNotExist` or `MultipleObjectsReturned` in corresponding cases.
+
+Can use `pk=` so Django automatically know which field is the primary key.
+
+`SELECT * FROM model_class WHERE attribute=value;` => `model_instances = ModelClass.objects.filter(attribute=value)`
+
+`filter()` and `exclude()` can be chained multiple times. `QuerySet` are only executed lazily when it is evaluated.
+
+For multiple constrains, just include multiple arguments in `filter()`.
+
+`LIMIT a_number` => `[:a_number]`
+
+`OFFSET a_number LIMIT another_number` => `[a_number:a_number+another_number]`
+
+Unlike normal python, negative indexes are not supported.
+
+`field__lookuptype=value` with possible lookup types include:
+
+- `JOIN`: `foreignKeyName__foreignClassAttributeName`
+- String operations:
+  - `exact`
+  - `iexact`
+  - `contains`
+  - `startswith`, `endswith`
+
+Refer fields in the same model by F-expression `F('refereed field name')`. Also can do basic arithmetic operations in the F side. Operations includes
+
+- `+`, `-`, `*`
+- `timedelta()`
+- `bitand()`, `.bitor()`, `.bitrightshift()`, and `.bitleftshift()`
+
+Q-operations for more complicated queries, which can work together with `|` and `&`.
+
+#### `DELECT`
+
+`[result SELECT QuerySet].delete()`. No need to `save()` after the operation.
+
 #### `UPDATE`
+
+Update one instance:
 
 ```python
 model_instance = ModelClass.objects.get(...)
@@ -190,11 +233,9 @@ model_instance.class_attribute = new_value
 model_instance.save()
 ```
 
-#### `SELECT`
+Update multiple instances:
 
-`SELECT * FROM model_class;` => `all_model_instances = ModelClass.objects.all()`
-
-`SELECT * FROM model_class WHERE attribute=value;` => `model_instances = ModelClass.objects.filter(attribute=value)`
+`[result SELECT QuerySet].update(attribute=value)`. No need to `save()` after the operation.
 
 #### Interacting with the database
 
