@@ -111,6 +111,10 @@ Model classes represent SQL tables. (Generally) it maps to *a single* database t
 - Model classes are subclasses `django.db.models.Model`. 
 - By default table name `appName_className`.
 
+```python
+class ModelClass(models.Model):
+```
+
 #### Model attributes
 
 Class attributes may represent field/column of SQL tables.
@@ -192,7 +196,7 @@ Can use `pk=` so Django automatically know which field is the primary key.
 
 `SELECT * FROM model_class WHERE attribute=value;` => `model_instances = ModelClass.objects.filter(attribute=value)`
 
-`filter()` and `exclude()` can be chained multiple times. `QuerySet` are only executed lazily when it is evaluated.
+`filter()` and `exclude()` can be chained multiple times. `QuerySet` are only executed lazily when it is evaluated. For values in foreign keys, use `.select_related()` if want to eagerly query nested values.
 
 For multiple constrains, just include multiple arguments in `filter()`.
 
@@ -225,7 +229,7 @@ Q-operations for more complicated queries, which can work together with `|` and 
 
 #### `UPDATE`
 
-Update one instance:
+Update one instance (it can also be used to remove relationship for null-able foreign keys):
 
 ```python
 model_instance = ModelClass.objects.get(...)
@@ -240,6 +244,35 @@ Update multiple instances:
 #### Interacting with the database
 
 - Save to database by `model_instance.save()`.
+
+### Manager
+
+Manager is the interface to save common user queries. One model should have at least one manager. Manager is similar to data access object (DAO) and/or repository in Java/Hibernate/Spring data.
+
+By default, `model_instance.objects` return a manager. To overwrite it by `another_name = models.Manager()` in the model definition.
+
+Manager can:
+
+- Add extra query methods.
+- Customize/overwrite existing methods (then you don't want to overwrite the existing manage, but to let the model to have multiple managers).
+
+```python
+class ExtendedModelManager(models.Manager):
+  def customized_new_query(self, ...):
+    ...
+
+class OverwrittenModelManager(models.Manager):
+  def get_queryset(self): # get_queryset() is defined in models.Manager
+    ... 
+
+class ModelClass(models.Model):
+  objects = ExtendedModelManager()
+  customized_manager = OverwrittenModelManager()
+```
+
+If overwrite `get_queryset()`, then don't rewrite default manager (`Meta.default_manager_name`) or it may results in an inability to retrieve objects.
+
+In `customized_manager` (the one to overwrite `get_queryset()`), one may consider using a customized/extended `models.QuerySet`.
 
 ## References
 
