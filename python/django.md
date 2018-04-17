@@ -30,7 +30,7 @@ Database deployment:
 Project structure:
 
 ```
-project_name/
+project_folder_root/
     manage.py
     project_name/
         __init__.py
@@ -43,19 +43,20 @@ project_name/
         wsgi.py      <-- web server on top of WSGI
 ```
 
-App structure (stays anywhere inside of the project folder):
+App structure (stays anywhere inside of the project folder (`project_folder_root`)):
 
 ```
-app_name/
-    __init__.py
-    admin.py
-    apps.py
-    migrations/
-        __init__.py  <-- django generated code goes here
-    models.py        <-- build-in ORM layer and SQL generator
-    tests.py
-    views.py
-    (urls.py)        <-- modify project urls.py accordingly
+project_folder_root/
+    app_name/
+        __init__.py
+        admin.py
+        apps.py
+        migrations/
+            __init__.py  <-- django generated code goes here
+        models.py        <-- build-in ORM layer and SQL generator
+        tests.py
+        views.py
+        (urls.py)        <-- modify project urls.py accordingly
 ```
 
 Run applications:
@@ -92,6 +93,25 @@ class Command(BaseCommand):
 ```
 
 It can be executed by `./manage.py my_command args`.
+
+### Unit test
+
+```
+python manage.py test
+python manage.py test app_name
+python manage.py test app_name.test_module_name
+python manage.py test app_name.test_module_name.TestCaseName
+python manage.py test app_name.test_module_name.TestCaseName.test_method_name
+
+python manage.py test path/to/the/directory/all/tests/stay
+python manage.py test --pattern="tests_*.py"
+```
+
+`Ctrl-C` first time to exit after the current test. `Ctrl-C` two times to exit immediately.
+
+Generally, the test will destroy and re-establish a (real) testing database. `--keepdb` to prevent that (still create if non-existence or migration is needed). 
+
+*(So it seems no easy way to mock the connection to a real database??)*
 
 ## ORM
 
@@ -134,6 +154,8 @@ Class attributes may represent field/column of SQL tables.
 - Primary key is automatically generated to the `id` field. No need to define a class attribute called `id`.
   - May be customized by `primary_key_class_attribute = models.AutoField(primary_key=True)`. It will not be auto-incrementing. *(But auto-incrementing should be the SQL job -- SQL may choice another ways to generate unique primary key. This is only triggered when insert with a leak of primary key value. Why mentioned auto-incrementing in here?)*
 - Class attributes are the only required part of a model class.
+
+*(It seems no easy build-in way to handle postgres schema??)*
 
 #### Relations
 
