@@ -155,7 +155,7 @@ Class attributes may represent field/column of SQL tables.
   - May be customized by `primary_key_class_attribute = models.AutoField(primary_key=True)`. It will not be auto-incrementing. *(But auto-incrementing should be the SQL job -- SQL may choice another ways to generate unique primary key. This is only triggered when insert with a leak of primary key value. Why mentioned auto-incrementing in here?)*
 - Class attributes are the only required part of a model class.
 
-*(It seems no easy build-in way to handle postgres schema??)*
+Django doesn't have a default way to enable schema in Postgres. One possible way of doing that is through the `django-tenant-schema` package ([code](https://github.com/bernardopires/django-tenant-schemas)/[document](http://django-tenant-schemas.readthedocs.io/en/latest/index.html).
 
 #### Relations
 
