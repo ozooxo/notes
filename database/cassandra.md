@@ -35,7 +35,7 @@ Container layers (outermost to inner)
 + **Column**
 	+ Act as a nested key-value(-timestamp) pair
 	+ Always have three values
-		+ Dey/column name
+		+ Key/column name
 		+ Value
 		+ Time stamp
 	+ A special column called **super column** which saves a set of columns (one like to query together).
