@@ -23,7 +23,7 @@
 
 ## Instance variable vs class variable
 
-|       | Instance variable | class variable |
+|       | Instance variable | class variable ~ class attribute |
 | ----- | ----------------- | -------------- |
 | Defined | Inside of methods with prefix `self`. Note that they may or may not be defined in `__init__`. | Defined in the class scope without prefix. |
 | Used as default value of method argument | N/A | without prefix |

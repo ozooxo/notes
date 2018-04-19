@@ -296,6 +296,12 @@ If overwrite `get_queryset()`, then don't rewrite default manager (`Meta.default
 
 In `customized_manager` (the one to overwrite `get_queryset()`), one may consider using a customized/extended `models.QuerySet`.
 
+### Databases
+
+#### PostgreSQL
+
+Beside the "schema" discussion in previous paragraph, this slide of [Going beyond Django ORM limitations with Postgres](https://www.slideshare.net/craigkerstiens/going-beyond-django-orm-with-postgres) may also help.
+
 ## References
 
 1. Official [Writing your first Django app](https://docs.djangoproject.com/en/2.0/intro/tutorial01/). It is actually a quite long tutorial that tell you in depth how to use django (in its design way to make a startard web app). Most paragraphs are about how to setup the views.
