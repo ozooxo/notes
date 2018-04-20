@@ -170,7 +170,7 @@ Class attributes may represent SQL relations.
 
 Also, notice that since python classes cannot be used before being defined, definition can only go one way. So for one-to-many relationship, the one-class need to go before the many-class. For many-to-many relationship, the `models.ManyToManyField` class attribute can only be set for the later class.
 
-#### Inheritance
+#### Inheritance mapping
 
 For inheritance mapping, compare to all what can be done in Hibernate:
 

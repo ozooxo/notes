@@ -52,7 +52,7 @@ May define `primaryjoin` as a keyword argument in `relationship()` if one want t
 
 The relationship table is not a concrete class.
 
-```
+```python
 many_to_many_relation = Table('many_to_many_relation', Base.metadata,
     Column('class1_id', ForeignKey('list_of_class1.id'), primary_key=True),
     Column('class2_id', ForeignKey('list_of_class2.id'), primary_key=True)
@@ -72,6 +72,19 @@ class Class2(Base):
                              secondary=post_keywords,
                              back_populates='list_of_class2')
 ```
+
+### Inheritance mapping
+
+Supports:
+
++ Single table inheritance: several types of classes are represented by a single table
++ Concrete table inheritance: each type of class is represented by independent tables
+  + Hard to configure
++ Joined table inheritance: the class hierarchy is broken up among dependent tables, each class represented by its own table that only includes those attributes local to that class.
+  + Basically just build the one-to-one-or-zero relationship in the data model, then SQLAlchemy can help query the target model type.
+  + Need to setup `polymorphic_identity` and `polymorphic_on` of `__mapper_args__` in some places.
+
+There's a mapped superclass (not that useful by the way) for which it doesn't support.
 
 ### Migration
 
