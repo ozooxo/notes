@@ -33,7 +33,7 @@ from sqlalchemy.orm import relationship
 class ManyModelClass(Base):
     ...
 
-    one_model_attribute_id = Column(Integer, ForeignKey('one_model_attribute.id'))
+    one_model_attribute_id = Column(Integer, ForeignKey('one_model_sql_table_name.id'))
     one_model_attribute = relationship("OneModelClass", back_populates="list_of_many_model_attributes")
 
 class OneModelClass(Base):
