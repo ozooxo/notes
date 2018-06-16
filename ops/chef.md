@@ -74,11 +74,11 @@ Component relationship:
 
 ### From Workstation
 
-`knife cookbook upload [cookbook-name]`
-
 `berks install`: using setups provided by Chef Supermarket.
 
 `berks upload --no-ssl-verify`
+
+Dependency issues are solved by Berkshelf.
 
 Templates.
 
@@ -86,15 +86,11 @@ May have roles (under the `roles` directory) using `json` configs. Then `knife r
 
 `knife role list`
 
-### From Chef server
+##### To server
 
-`knife node list`/`knife node show customized-node-name`
+`knife cookbook upload [cookbook-name]`
 
-Chef Automate server is built on top of it.
-
-May clean up the environments by manually deleting nodes (still need to tear down the instance), cookbooks (all versions/particular version), and/or roles.
-
-### From node
+##### To node
 
 `knife bootstrap`
 
@@ -104,9 +100,69 @@ Can be authorized using:
 + Password
 + Forwarded port (for local VM)
 
-`knife ssh`: update configuration
+Then the node get relative information from chef server.
+
+`knife ssh`: update configuration/copy files to the node. May include the information about Chef server (then install chef on that machine).
+
+### From Chef server
+
+`knife node list`/`knife node show customized-node-name` (seems can also be executed on workstation...)
+
+Chef Automate server is built on top of it.
+
+May clean up the environments by manually deleting nodes (still need to tear down the instance), cookbooks (all versions/particular version), and/or roles.
+
+### From node
+
+`chef-client`: Communicate with Chef server.
 
 May use the `chef-client` cookbook to automatically update notes. Trigger the `chef-client` by `knife ssh 'role:customized_role_name' 'sudo chef-client' --ssh-user ubuntu --identity-file ~/.ssh/private_key --attribute ipaddress`
+
+### Cookbook
+
+`chef generate cookbook [cookbook-name]`
+
+`chef generate attribute default`
+
+`chef generate template default.conf`
+
+`chef generate recipe [recipe-name]`
+
+### Kitchen
+
+`kitchen list`
+
+`kitchen create`
+
+`kitchen converge`
+
+`kitchen exec -c '[command on the targeting node machine]'`
+
+`kitchen exec -c 'wget -qO- localhost'`
+
+`kitchen test`: apply your final configuration on a clean instance.
+
+`kitchen destroy`
+
+#### Linter tests
+
+Those are ChefDK commands for which my current
+
+`foodcritic`
+
+`cookstyle`
+
+#### Unit test
+
+Using ChefSpec
+
+`chef exec rspec .` under recipe folder
+
+#### Integrate test
+
+Using InSpec: validation after `chef-client` run.
+
+`kitchen verify`
 
 ## Overlap with/competitors
 
